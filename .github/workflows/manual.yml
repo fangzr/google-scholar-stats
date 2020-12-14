@@ -1,0 +1,29 @@
+name: Get Citation Data
+
+on:
+  push:
+    branches: ['main']
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Reqs
+      run: pip3 install -r requirements.txt
+    - name: Run Py
+      run: python3 main.py
+    - name: Commit files
+      run: |
+        git config --local user.name "Github Action"
+        git add *.json
+        git commit -m "Updated Citation Data"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: main
+        force: true
