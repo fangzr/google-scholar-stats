@@ -2,69 +2,63 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import time
+import random
 
 def get_scholar_stats(user_id):
     """从Google Scholar获取引用统计数据"""
     url = f"https://scholar.google.com/citations?user={user_id}&hl=en"
+    
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5'
     }
+    
+    print(f"开始请求 URL: {url}")
     
     # 添加重试机制
     for attempt in range(3):
         try:
-            response = requests.get(url, headers=headers)
+            # 添加随机延迟
+            time.sleep(1 + random.random() * 2)
+            
+            response = requests.get(url, headers=headers, timeout=30)
+            print(f"尝试 {attempt+1} 状态码: {response.status_code}")
+            
             if response.status_code == 200:
-                break
-            print(f"尝试 {attempt+1} 失败，HTTP状态码: {response.status_code}")
-            time.sleep(2)  # 等待2秒后重试
+                # 使用BeautifulSoup解析HTML
+                soup = BeautifulSoup(response.text, 'html.parser')
+                
+                # 使用方法二：查找引用数字元素
+                td_elements = soup.find_all('td', class_='gsc_rsb_std')
+                if td_elements and len(td_elements) >= 3:
+                    citations = td_elements[0].text
+                    h_index = td_elements[1].text
+                    i10_index = td_elements[2].text
+                    print(f"获取成功: 引用: {citations}, h-index: {h_index}, i10-index: {i10_index}")
+                    return {
+                        'citations': citations,
+                        'h_index': h_index,
+                        'i10_index': i10_index
+                    }
+                else:
+                    print(f"未找到足够的td元素，找到了 {len(td_elements) if td_elements else 0} 个")
+            
+            print(f"尝试 {attempt+1} 失败，将重试...")
+            time.sleep(2)  # 等待一段时间后重试
         except Exception as e:
             print(f"尝试 {attempt+1} 出现异常: {e}")
-            time.sleep(2)  # 等待2秒后重试
+            time.sleep(2)  # 等待一段时间后重试
     
-    if response.status_code != 200:
-        print(f"无法获取数据，HTTP状态码: {response.status_code}")
-        return None
-    
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    try:
-        # 找到引用统计表格
-        stats_table = soup.select_one('table#gsc_rsb_st')
-        if not stats_table:
-            print("未找到统计表格")
-            return None
-        
-        # 提取各项指标数据
-        rows = stats_table.select('tr.gsc_rsb_std')
-        if not rows or len(rows) < 3:
-            print("未找到足够的统计行")
-            return None
-        
-        citations = rows[0].select_one('td.gsc_rsb_std').text
-        h_index = rows[1].select_one('td.gsc_rsb_std').text
-        i10_index = rows[2].select_one('td.gsc_rsb_std').text
-        
-        # 尝试获取作者姓名
-        name_elem = soup.select_one('#gsc_prf_in')
-        name = name_elem.text if name_elem else "Scholar"
-        
-        return {
-            'name': name,
-            'citations': citations,
-            'h_index': h_index,
-            'i10_index': i10_index
-        }
-    except Exception as e:
-        print(f"解析数据时出错: {e}")
-        return None
+    print("所有尝试均失败，无法获取数据")
+    return None
 
 def create_badge_file(label, message, color, style, filename):
     """创建徽章数据文件"""
     data = {
         "schemaVersion": 1,
         "label": label,
-        "message": message,
+        "message": str(message),
         "color": color,
         "style": style
     }
@@ -73,7 +67,6 @@ def create_badge_file(label, message, color, style, filename):
         json.dump(data, f)
     print(f"已创建徽章文件: {filename}")
 
-# 主函数
 def main():
     # 替换为你的Google Scholar ID
     scholar_id = "yggQMJMAAAAJ"
@@ -92,11 +85,13 @@ def main():
         create_badge_file("i10-index", stats['i10_index'], badge_color, badge_style, "badge-i10index.json")
         
         print("所有徽章文件已成功创建")
+        return True
     else:
         print("无法获取Scholar数据，创建占位徽章")
         create_badge_file("citations", "N/A", "gray", badge_style, "badge-citations.json")
         create_badge_file("h-index", "N/A", "gray", badge_style, "badge-hindex.json")
         create_badge_file("i10-index", "N/A", "gray", badge_style, "badge-i10index.json")
+        return False
 
 if __name__ == "__main__":
     main()
