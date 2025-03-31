@@ -1,6 +1,1 @@
-{
-  "schemaVersion": 1,
-  "label": "citations",
-  "message": "123",
-  "color": "blue"
-}
+{"schemaVersion": 1, "label": "citations", "message": "N/A", "color": "gray", "style": "flat-square"}
