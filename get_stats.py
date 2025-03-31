@@ -53,25 +53,40 @@ def get_scholar_stats(user_id):
     print("所有尝试均失败，无法获取数据")
     return None
 
-def create_styled_badge(citations, filename):
-    """创建类似示例样式的徽章JSON"""
+def create_badge_file(label, message, color, style, filename):
+    """创建普通徽章数据文件"""
     data = {
         "schemaVersion": 1,
-        "label": "citations",
-        "message": str(citations),
-        "color": "9cf",
-        "labelColor": "f6f6f6",
-        "style": "flat",
-        "logo": "Google Scholar"
+        "label": label,
+        "message": str(message),
+        "color": color,
+        "style": style
     }
     
     with open(filename, 'w') as f:
         json.dump(data, f)
     print(f"已创建徽章文件: {filename}")
 
+def create_combined_badge(citations, filename):
+    """创建带有Google Scholar logo的组合徽章"""
+    data = {
+        "schemaVersion": 1,
+        "label": "Google Scholar",
+        "message": f"Citations: {citations}",
+        "color": "1f1f18",
+        "style": "flat-square",
+        "logoSvg": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNMjU2IDQxMS4xMkwwIDIwMi42NjcgMjU2IDBoMjU2djIwMi42NjdsLTI1NiAyMDguNDUzeiIvPjxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0yNTYgNDExLjEyTDI1NiAzMTEuNjk0IDE3OC42NTcgMjU2IDE0Ni4wODcgMjU2bDEwOS45MTMgMTU1LjEyeiIvPjxjaXJjbGUgZmlsbD0iI0ZGRkZGRiIgY3g9IjIwMS4wNDMiIGN5PSIxODUuNzgyIiByPSI0MS4zOTEiLz48cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNMzc3LjM5NiAxODIuODA5aC00Mi40MzV2NDIuNGgtMjEuMnYtNDIuNGgtNDIuMzk2di0yMS4yaDQyLjM5NnYtNDIuNGgyMS4ydjQyLjRoNDIuNDM1djIxLjJ6Ii8+PC9zdmc+"
+    }
+    
+    with open(filename, 'w') as f:
+        json.dump(data, f)
+    print(f"已创建组合徽章文件: {filename}")
+
 def main():
     # 替换为你的Google Scholar ID
     scholar_id = "yggQMJMAAAAJ"
+    badge_style = "flat-square"
+    badge_color = "1f1f18"
     
     print("开始获取Google Scholar数据...")
     stats = get_scholar_stats(scholar_id)
@@ -79,14 +94,22 @@ def main():
     if stats:
         print(f"成功获取数据: 引用: {stats['citations']}, h-index: {stats['h_index']}, i10-index: {stats['i10_index']}")
         
-        # 创建样式化的徽章
-        create_styled_badge(stats['citations'], "gs_data_shieldsio.json")
+        # 创建组合徽章文件
+        create_combined_badge(stats['citations'], "badge-scholar-citations.json")
         
-        print("徽章文件已成功创建")
+        # 创建普通徽章文件
+        create_badge_file("citations", stats['citations'], badge_color, badge_style, "badge-citations.json")
+        create_badge_file("h-index", stats['h_index'], badge_color, badge_style, "badge-hindex.json")
+        create_badge_file("i10-index", stats['i10_index'], badge_color, badge_style, "badge-i10index.json")
+        
+        print("所有徽章文件已成功创建")
         return True
     else:
         print("无法获取Scholar数据，创建占位徽章")
-        create_styled_badge("N/A", "gs_data_shieldsio.json")
+        create_combined_badge("N/A", "badge-scholar-citations.json")
+        create_badge_file("citations", "N/A", "gray", badge_style, "badge-citations.json")
+        create_badge_file("h-index", "N/A", "gray", badge_style, "badge-hindex.json")
+        create_badge_file("i10-index", "N/A", "gray", badge_style, "badge-i10index.json")
         return False
 
 if __name__ == "__main__":
