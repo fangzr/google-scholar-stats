@@ -2,8 +2,7 @@
 
 [![Google Scholar](https://img.shields.io/badge/Google%20Scholar-%2320beff?color=1f1f18&logo=google-scholar&style=flat-square)](https://scholar.google.com/citations?hl=en&user=yggQMJMAAAAJ)
 [![Citations](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/fangzr/google-scholar-stats/main/badge-citations.json&style=flat-square)](https://scholar.google.com/citations?hl=en&user=yggQMJMAAAAJ)
-[![h-index](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/fangzr/google-scholar-stats/main/badge-hindex.json&style=flat-square)](https://scholar.google.com/citations?hl=en&user=yggQMJMAAAAJ)
-[![i10-index](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/fangzr/google-scholar-stats/main/badge-i10index.json&style=flat-square)](https://scholar.google.com/citations?hl=en&user=yggQMJMAAAAJ)
+[![H-index](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/fangzr/google-scholar-stats/main/badge-i10index.json&style=flat-square)](https://scholar.google.com/citations?hl=en&user=yggQMJMAAAAJ)
 
 这个仓库使用GitHub Actions自动从Google Scholar获取引用统计数据，每天更新一次。
 
