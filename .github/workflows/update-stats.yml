@@ -2,7 +2,7 @@ name: Update Scholar Stats
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天运行一次
+    - cron: '0 0 * * *'  # 每天午夜运行一次
   workflow_dispatch:  # 允许手动触发
 
 permissions:
@@ -16,29 +16,53 @@ jobs:
         with:
           persist-credentials: true
       
-      - name: Create test badge data
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'  # 使用Python 3.9或更高版本
+          
+      - name: Install dependencies
         run: |
-          # 创建简单的静态JSON文件，确保徽章可以显示
-          echo '{
-            "schemaVersion": 1,
-            "label": "citations",
-            "message": "123",
-            "color": "blue"
-          }' > badge-citations.json
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+      
+      - name: Run dynamic stats update
+        run: |
+          python get_stats.py
+        continue-on-error: true  # 即使脚本失败也继续工作流程
+      
+      - name: Create fallback badges if needed
+        run: |
+          # 检查徽章文件是否存在，如果不存在则创建
+          if [ ! -f badge-citations.json ]; then
+            echo '{
+              "schemaVersion": 1,
+              "label": "citations",
+              "message": "N/A",
+              "color": "gray",
+              "style": "flat-square"
+            }' > badge-citations.json
+          fi
           
-          echo '{
-            "schemaVersion": 1,
-            "label": "h-index",
-            "message": "5",
-            "color": "green"
-          }' > badge-i10index.json
+          if [ ! -f badge-hindex.json ]; then
+            echo '{
+              "schemaVersion": 1,
+              "label": "h-index",
+              "message": "N/A",
+              "color": "gray",
+              "style": "flat-square"
+            }' > badge-hindex.json
+          fi
           
-          echo '{
-            "schemaVersion": 1,
-            "label": "i10-index",
-            "message": "3",
-            "color": "orange"
-          }' > badge-i10index.json
+          if [ ! -f badge-i10index.json ]; then
+            echo '{
+              "schemaVersion": 1,
+              "label": "i10-index",
+              "message": "N/A",
+              "color": "gray",
+              "style": "flat-square"
+            }' > badge-i10index.json
+          fi
         
       - name: Commit and push if changed
         run: |
