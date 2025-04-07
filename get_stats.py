@@ -187,11 +187,11 @@ def main():
             time.sleep(10)  # 等待10秒后重试整个程序
     
     if not success:
-        print("所有主程序尝试均失败，创建占位徽章")
-        create_combined_badge("N/A", "badge-scholar-citations.json")
-        create_badge_file("citations", "N/A", "gray", badge_style, "badge-citations.json")
-        create_badge_file("h-index", "N/A", "gray", badge_style, "badge-hindex.json")
-        create_badge_file("i10-index", "N/A", "gray", badge_style, "badge-i10index.json")
+        # print("所有主程序尝试均失败，创建占位徽章")
+        # create_combined_badge("N/A", "badge-scholar-citations.json")
+        # create_badge_file("citations", "N/A", "gray", badge_style, "badge-citations.json")
+        # create_badge_file("h-index", "N/A", "gray", badge_style, "badge-hindex.json")
+        # create_badge_file("i10-index", "N/A", "gray", badge_style, "badge-i10index.json")
         # 在GitHub Actions中，我们希望失败时返回非零值
         sys.exit(1)
     
