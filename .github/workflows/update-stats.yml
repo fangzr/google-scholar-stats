@@ -2,7 +2,7 @@ name: Update Scholar Stats
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # 每天午夜运行一次
+    - cron: '0 0 * * *'  # 每天运行一次
   workflow_dispatch:  # 允许手动触发
 
 permissions:
